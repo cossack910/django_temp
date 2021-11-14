@@ -1,0 +1,26 @@
+version: "3.0"
+
+services:
+  django_tutorial:
+    restart: always
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    # ports:
+    #   - 8000:8000
+    expose:
+      - '8001'
+    command: uwsgi --socket :8001 --module mysite.wsgi
+    container_name: django_tutorial
+  nginx_tutorial:
+    image: nginx:latest
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/uwsgi_params:/etc/nginx/uwsgi_params
+      - ./src/static:/static
+    ports:
+      - 80:80
+    depends_on:
+      - django_tutorial
+    container_name: nginx_tutorial
